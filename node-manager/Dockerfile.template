@@ -1,13 +1,21 @@
 # Define a reusable argument containing the path to the go project
 # see: https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact
 ARG PROJECT_DIR=/go/src/github.com/resin-io/edge-node-manager
+ARG GLIDE_DIR=/go/src/github.com/Masterminds
+
 
 # Build source using an image that has Go and Glide
-FROM billyteves/alpine-golang-glide:1.2.0 as GO
+FROM balenalib/%%BALENA_MACHINE_NAME%%-golang:latest-build AS GO
+
+ARG GLIDE_DIR
+RUN  mkdir -p $GLIDE_DIR
+RUN  cd $GLIDE_DIR &&  git clone https://github.com/Masterminds/glide.git 
+WORKDIR $GLIDE_DIR/glide
+RUN make install
 
 ARG PROJECT_DIR
 
-RUN mkdir -p $PROJECT_DIR
+RUN  mkdir -p $PROJECT_DIR
 COPY . $PROJECT_DIR
 WORKDIR $PROJECT_DIR
 
@@ -16,6 +24,7 @@ RUN glide install
 
 # Cross compile the ENM binary
 RUN env GOOS=linux GOARCH=arm go build
+# RUN env GOOS=linux GOARCH=amd64 go build
 
 # Debian base-image
 # See more about resin base images here: http://docs.resin.io/runtime/resin-base-images/
