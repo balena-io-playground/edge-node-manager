@@ -1,0 +1,14 @@
+version: "2"
+volumes:
+  data:
+services:
+  node-manager:
+    build: ./node-manager
+    volumes:
+      - "data:/data"
+    restart: always
+    privileged: true
+    network_mode: host
+    labels:
+      io.balena.features.supervisor-api: "1"
+      io.balena.features.dbus: "1"
