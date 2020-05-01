@@ -28,25 +28,20 @@ RUN env GOOS=linux GOARCH=arm go build
 
 # Debian base-image
 # See more about resin base images here: http://docs.resin.io/runtime/resin-base-images/
-FROM resin/%%RESIN_MACHINE_NAME%%-debian
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian
 
 ARG PROJECT_DIR
 
-# Disable systemd init system
-ENV INITSYSTEM off
-
 # Set our working directory
 WORKDIR /usr/src/app
-
 # The raspberrypi3 requires extra packages - `bluez-firmware`
 ENV EXTRA_PACKAGES ""
-RUN if [ "%%RESIN_MACHINE_NAME%%" = "raspberrypi3" ]; then export EXTRA_PACKAGES="bluez-firmware"; fi && \
-    apt-get update && apt-get install -yq --no-install-recommends \
+RUN if [ "%%BALENA_MACHINE_NAME%%" = "raspberrypi3" ]; then export EXTRA_PACKAGES="bluez-firmware"; fi && \
+    install_packages \
     $EXTRA_PACKAGES \
     bluez \
     curl \
-    jq && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    jq
 
 # Copy the cross-compiled binary into the working directory
 COPY --from=GO $PROJECT_DIR/edge-node-manager ./
