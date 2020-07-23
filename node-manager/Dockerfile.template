@@ -47,4 +47,6 @@ RUN if [ "%%BALENA_MACHINE_NAME%%" = "raspberrypi3" ]; then export EXTRA_PACKAGE
 COPY --from=GO $PROJECT_DIR/edge-node-manager ./
 
 # The edge-node-manager will run when container starts up on the device
-CMD ["./edge-node-manager"]
+COPY start.sh ./
+RUN chmod u+x start.sh
+CMD ["./start.sh"]
